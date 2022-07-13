@@ -1,0 +1,12 @@
+*{
+    padding: 0px;
+    margin: 0px;
+    overflow: hidden;
+}
+.gameIU{
+    display: flex;
+    justify-content: center;
+}
+.bActive{
+    background-color: rgba(150,150,150,0.5);
+}
