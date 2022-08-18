@@ -1,0 +1,5 @@
+Ramassage objet : 
+- définir les zones où l'on peux ramasser les objet (FAIT)
+- ramasser quand clic droit (FAIT)
+- ajouter l'objet à l'inventaire, pour l'instant case 0 (FAIT)
+- actualiser la carte

@@ -1,13 +1,13 @@
 const barreAccèsRapide = document.createElement("div");
 const game = document.querySelector("body")
 let width = 450;
-let height = 50;
+let height = 75;
 barreAccèsRapide.setAttribute("style", "position: absolute; bottom: 20px; height:"+height+"px; background-color: rgba(50,50,50,0.5); display: flex; border: 1px solid white")
 game.append(barreAccèsRapide)
 
 for (i=0;i<9;i++){
     const cases = document.createElement("div");
-    cases.setAttribute("style", "border-right: 1px solid white; border-left: 1px solid white; height: 50px; width: 48px");
+    cases.setAttribute("style", "border-right: 1px solid white; border-left: 1px solid white; height: 75px; width: 73px; display: grid; grid-template-rows: repeat(1,100%);grid-template-columns: repeat(1,70% 30%);");
     cases.setAttribute("id","case"+i);
     barreAccèsRapide.append(cases)
 }

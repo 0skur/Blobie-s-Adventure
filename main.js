@@ -66,7 +66,7 @@ const player = new Sprite({
     image: playerImage
 })
 
-const background = new Sprite({ 
+const background = new Sprite({
     position:{
         x: offset.x,
         y: offset.y
@@ -93,45 +93,55 @@ const keys = {
 //_____________________________________________________INTERACTIF_OBJECT_____________________________________________________
 
 let ramassableMap = [];
-for (let i =0; i<ramassable.length;i += 50){
-    ramassableMap.push(ramassable.slice(i,50 +i));
+function ramassableMapCalc(){
+    ramassableMap = []
+    for (let i =0; i<ramassable.length;i += 50){
+        ramassableMap.push(ramassable.slice(i,50 +i));
+    }
 }
+ramassableMapCalc()
 const planteSrc = new Image();
 planteSrc.src = "data/interactifObject/plante.png"
-
 
 class interactif{
     static width = 128;
     static height = 128;
-    constructor({position, image, width, height, index}){
+    constructor({position, image, width, height, index, symbol}){
         this.image = image;
         this.position = position;
         this.width = width;
         this.height = height;
         this.index = index
+        this.symbol = symbol
         }
     draw(){
         c.drawImage(this.image,this.position.x,this.position.y)
     }
 }
 
-const gatherable = []
+let varMoveX = 0
+let varMoveY = 0
+let gatherable = []
+
+function gatherableCalc(){
+    gatherable = []
     ramassableMap.forEach((row, i) => {
         row.forEach((Symbol, j) => {
-            if (Symbol === 11)
+            if (Symbol !== 0)
             gatherable.push(new interactif({position: {
-                x:j*interactif.width + offset.x,
-                y:i*interactif.height + offset.y
+                x:j*interactif.width + offset.x + varMoveX,
+                y:i*interactif.height + offset.y + varMoveY
             },
             image: planteSrc,
             height: 128,
             width: 128,
-            index: (+i*50)+j
+            index: (+i*50)+j,
+            symbol: Symbol
         }))
         })
     })
-console.log(ramassableMap)
-console.log(gatherable)
+}
+gatherableCalc()
 const gatherer = player;
 
 function gather({gatherer, gatherable}){
@@ -139,9 +149,12 @@ function gather({gatherer, gatherable}){
         gatherer.position.x + gatherer.width >= gatherable.position.x   &&
         gatherer.position.x <= gatherable.position.x +gatherable.width  &&
         gatherer.position.y + gatherer.height >= gatherable.position.y  &&
-        gatherer.position.y <= gatherable.position.y + gatherable.height 
+        gatherer.position.y <= gatherable.position.y + gatherable.height
     )
 }
+
+let casesStatus = [0,0,0,0,0,0,0,0,0]
+let casesStatusNum = [0,0,0,0,0,0,0,0,0]
 function gatherEvent(){
     window.addEventListener("mouseup",(e)=>{
         if(typeof e === "object"){
@@ -152,18 +165,33 @@ function gatherEvent(){
                 })){
                     switch(e.button){
                         case 2:
-                            let item = new Image();
-                            item.src = "data/Item/fibre.png";
-                            let cases = document.getElementById("case0")
-                            cases.append(item)
+                            console.log(casesStatus)
+                            if(casesStatus[0] == 0){
+                                let item = new Image();
+                                let itemList = ["data/Item/fibre.png"]
+                                item.src = itemList[interactif.symbol-1];
+                                let cases = document.getElementById("case0")
+                                cases.append(item);
+                                let number = document.createElement("p")
+                                number.setAttribute("name","count")
+                                casesStatusNum.splice([0],1,1)
+                                let iCount = casesStatusNum[0]
+                                number.innerHTML = iCount
+                                cases.append(number)
+                                casesStatus.splice([0], 1, interactif.symbol)
+                            }
+                            else{
+                                let number = document.getElementsByName("count")[0]
+                                casesStatusNum.splice([0],1,(casesStatusNum[0]+1))
+                                number.innerHTML = casesStatusNum[0]
+                            }
+                            console.log(casesStatus)
                             let index = interactif.index
                             let replace = 0
-                            console.log(index)
                             ramassable.splice(index, 1, replace)
-                            console.log(ramassableMap)
-                            console.log(gatherable)
                             ramassableMapCalc()
-                            console.log(ramassableMap)
+                            gatherableCalc()
+                            movablesCalc()
                         break;
                     }
                 }
@@ -174,7 +202,11 @@ function gatherEvent(){
 gatherEvent()
 
 //_____________________________________________________INTERACTIF_OBJECT_END____________________________________________________
-const movables = [background, ...boundaries, ...gatherable]
+let movables = []
+function movablesCalc(){
+    movables = [background, ...boundaries, ...gatherable]
+}
+movablesCalc()
 const speed = 5;
 
 function rectangularCollision({rectangle1, rectangle2}){
@@ -197,13 +229,91 @@ function animate(){
             console.log("ramasser")
         }
     })
-    
-    
+
+
     window.requestAnimationFrame(animate);
     player.draw()
     let moving = true
-    
-    if (keys.z.pressed){
+
+    if (keys.z.pressed && keys.d.pressed){
+        for (let i=0;i<boundaries.length;i++){
+            const boundary = boundaries[i];
+            if(
+                rectangularCollision({
+                    rectangle1: player,
+                    rectangle2: {...boundary, position: {
+                        x: boundary.position.x + (speed-1.5),
+                        y: boundary.position.y - (speed-1.5)
+                    }}
+                })
+            ){
+                moving = false;
+                break
+            }
+        }
+        for(let i=0;i<gatherable.length;i++){
+            const movable = gatherable[i]
+            if(
+                gather({
+                    gatherer: player,
+                    gatherable: {...movable, position: {
+                        x: movable.position.x,
+                        y: movable.position.y
+                    }}
+                })
+            ){
+
+            }
+        }
+        if (moving)
+            movables.forEach(movables => {
+                movables.position.y += speed-1.5
+                movables.position.x -= speed-1.5
+            })
+            varMoveY += speed-1.5
+            varMoveX -= speed-1.5
+    }
+
+    else if (keys.z.pressed && keys.q.pressed){
+        for (let i=0;i<boundaries.length;i++){
+            const boundary = boundaries[i];
+            if(
+                rectangularCollision({
+                    rectangle1: player,
+                    rectangle2: {...boundary, position: {
+                        x: boundary.position.x + (speed-1.5),
+                        y: boundary.position.y + (speed-1.5)
+                    }}
+                })
+            ){
+                moving = false;
+                break
+            }
+        }
+        for(let i=0;i<gatherable.length;i++){
+            const movable = gatherable[i]
+            if(
+                gather({
+                    gatherer: player,
+                    gatherable: {...movable, position: {
+                        x: movable.position.x,
+                        y: movable.position.y
+                    }}
+                })
+            ){
+
+            }
+        }
+        if (moving)
+            movables.forEach(movables => {
+                movables.position.y += speed-1.5
+                movables.position.x += speed-1.5
+            })
+            varMoveY += speed-1.5
+            varMoveX += speed-1.5
+    }
+
+    else if (keys.z.pressed){
         for (let i=0;i<boundaries.length;i++){
             const boundary = boundaries[i];
             if(
@@ -216,7 +326,7 @@ function animate(){
                 })
             ){
                 moving = false;
-                break 
+                break
             }
         }
         for(let i=0;i<gatherable.length;i++){
@@ -233,13 +343,92 @@ function animate(){
 
             }
         }
-        
         if (moving)
-        movables.forEach(movables => {
-            movables.position.y += speed
-        })
+            movables.forEach(movables => {
+                movables.position.y += speed
+            })
+            varMoveY += speed
     }
-    if (keys.q.pressed){
+
+    else if (keys.s.pressed && keys.q.pressed){
+        for (let i=0;i<boundaries.length;i++){
+            const boundary = boundaries[i];
+            if(
+                rectangularCollision({
+                    rectangle1: player,
+                    rectangle2: {...boundary, position: {
+                        x: boundary.position.x - (speed-1.5),
+                        y: boundary.position.y + (speed-1.5)
+                    }}
+                })
+            ){
+                moving = false;
+                break
+            }
+        }
+        for(let i=0;i<gatherable.length;i++){
+            const movable = gatherable[i]
+            if(
+                gather({
+                    gatherer: player,
+                    gatherable: {...movable, position: {
+                        x: movable.position.x,
+                        y: movable.position.y
+                    }}
+                })
+            ){
+
+            }
+        }
+        if (moving)
+            movables.forEach(movables => {
+                movables.position.y -= speed-1.5
+                movables.position.x += speed-1.5
+            })
+            varMoveY -= speed-1.5
+            varMoveX += speed-1.5
+    }
+
+    else if (keys.s.pressed && keys.d.pressed){
+        for (let i=0;i<boundaries.length;i++){
+            const boundary = boundaries[i];
+            if(
+                rectangularCollision({
+                    rectangle1: player,
+                    rectangle2: {...boundary, position: {
+                        x: boundary.position.x - (speed-1.5),
+                        y: boundary.position.y - (speed-1.5)
+                    }}
+                })
+            ){
+                moving = false;
+                break
+            }
+        }
+        for(let i=0;i<gatherable.length;i++){
+            const movable = gatherable[i]
+            if(
+                gather({
+                    gatherer: player,
+                    gatherable: {...movable, position: {
+                        x: movable.position.x,
+                        y: movable.position.y
+                    }}
+                })
+            ){
+
+            }
+        }
+        if (moving)
+            movables.forEach(movables => {
+                movables.position.y -= speed-1.5
+                movables.position.x -= speed-1.5
+            })
+            varMoveY -= speed-1.5
+            varMoveX -= speed-1.5
+    }
+
+    else if (keys.q.pressed){
         for (let i=0;i<boundaries.length;i++){
             const boundary = boundaries[i];
             if(
@@ -252,7 +441,7 @@ function animate(){
                 })
             ){
                 moving = false;
-                break 
+                break
             }
         }
         for(let i=0;i<gatherable.length;i++){
@@ -266,15 +455,16 @@ function animate(){
                     }}
                 })
             ){
-
             }
         }
         if (moving)
-        movables.forEach(movables => {
-            movables.position.x += speed
-        })
+            movables.forEach(movables => {
+                movables.position.x += speed
+            })
+            varMoveX += speed
     }
-    if (keys.s.pressed){
+
+    else if (keys.s.pressed){
         for (let i=0;i<boundaries.length;i++){
             const boundary = boundaries[i];
             if(
@@ -287,7 +477,7 @@ function animate(){
                 })
             ){
                 moving = false;
-                break 
+                break
             }
         }
         for(let i=0;i<gatherable.length;i++){
@@ -305,11 +495,13 @@ function animate(){
             }
         }
         if (moving)
-        movables.forEach(movables => {
-            movables.position.y -= speed
-        })
+            movables.forEach(movables => {
+                movables.position.y -= speed
+            })
+            varMoveY -= speed
     }
-    if (keys.d.pressed){
+
+    else if (keys.d.pressed){
         for (let i=0;i<boundaries.length;i++){
             const boundary = boundaries[i];
             if(
@@ -317,12 +509,12 @@ function animate(){
                     rectangle1: player,
                     rectangle2: {...boundary, position: {
                         x: boundary.position.x - speed,
-                        y: boundary.position.y 
+                        y: boundary.position.y
                     }}
                 })
             ){
                 moving = false;
-                break 
+                break
             }
         }
         for(let i=0;i<gatherable.length;i++){
@@ -332,7 +524,7 @@ function animate(){
                     gatherer: player,
                     gatherable: {...movable, position: {
                         x: movable.position.x,
-                        y: movable.position.y 
+                        y: movable.position.y
                     }}
                 })
             ){
@@ -340,9 +532,10 @@ function animate(){
             }
         }
         if (moving)
-        movables.forEach(movables => {
-            movables.position.x -= speed
-        })
+            movables.forEach(movables => {
+                movables.position.x -= speed
+            })
+            varMoveX -= speed
     }
 }
 animate()
@@ -350,7 +543,7 @@ let lastKey = '';
 window.addEventListener("keydown", (e) =>{
     switch(e.key){
         case "z":
-            keys.z.pressed = true;        
+            keys.z.pressed = true;
         break
         case "q":
             keys.q.pressed = true;
@@ -359,14 +552,14 @@ window.addEventListener("keydown", (e) =>{
             keys.s.pressed = true;
         break
         case "d":
-            keys.d.pressed = true;      
+            keys.d.pressed = true;
         break
     }
 })
 window.addEventListener("keyup", (e) =>{
     switch(e.key){
         case "z":
-            keys.z.pressed = false;         
+            keys.z.pressed = false;
         break
         case "q":
             keys.q.pressed = false;
@@ -375,7 +568,7 @@ window.addEventListener("keyup", (e) =>{
             keys.s.pressed = false;
         break
         case "d":
-            keys.d.pressed = false;      
+            keys.d.pressed = false;
         break
     }
-})                                         
+})
