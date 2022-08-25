@@ -5,8 +5,8 @@ canvas.width = innerWidth;
 canvas.height = innerHeight;
 
 const collisionsMap = [];
-for (let i =0; i<collisions.length;i += 50){
-    collisionsMap.push(collisions.slice(i,50 +i));
+for (let i =0; i<collisions.length;i += 39){
+    collisionsMap.push(collisions.slice(i,39 +i));
 }
 class Bondary{
     static width = 128;
@@ -24,12 +24,12 @@ class Bondary{
 const boundaries = [];
 const offset = {
     x: -2000,
-    y: -1000
+    y: -1800
 }
 
 collisionsMap.forEach((row, i) => {
     row.forEach((Symbol, j) => {
-        if (Symbol === 16)
+        if (Symbol === 37)
         boundaries.push(new Bondary({position: {
             x:j*Bondary.width + offset.x,
             y:i*Bondary.height + offset.y
@@ -38,7 +38,7 @@ collisionsMap.forEach((row, i) => {
 })
 
 const image = new Image();
-image.src = "data/map.png";
+image.src = "data/map_2.png";
 
 const playerImage = new Image();
 playerImage.src = "data/personnage.png"
@@ -95,13 +95,21 @@ const keys = {
 let ramassableMap = [];
 function ramassableMapCalc(){
     ramassableMap = []
-    for (let i =0; i<ramassable.length;i += 50){
-        ramassableMap.push(ramassable.slice(i,50 +i));
+    for (let i =0; i<ramassable.length;i += 39){
+        ramassableMap.push(ramassable.slice(i,39 +i));
     }
 }
 ramassableMapCalc()
-const planteSrc = new Image();
-planteSrc.src = "data/interactifObject/plante.png"
+const branche = new Image();
+branche.src = "data/interactifObject/branche.png"
+const caillou = new Image();
+caillou.src = "data/interactifObject/caillou.png"
+const buisson = new Image();
+buisson.src = "data/interactifObject/buisson.png"
+const buisson_baies = new Image();
+buisson_baies.src = "data/interactifObject/buisson_baies.png"
+
+
 
 class interactif{
     static width = 128;
@@ -127,34 +135,73 @@ function gatherableCalc(){
     gatherable = []
     ramassableMap.forEach((row, i) => {
         row.forEach((Symbol, j) => {
-            if (Symbol !== 0)
-            gatherable.push(new interactif({position: {
-                x:j*interactif.width + offset.x + varMoveX,
-                y:i*interactif.height + offset.y + varMoveY
-            },
-            image: planteSrc,
-            height: 128,
-            width: 128,
-            index: (+i*50)+j,
-            symbol: Symbol
-        }))
+            if (Symbol === 111+1){
+                gatherable.push(new interactif({position: {
+                    x:j*interactif.width + offset.x + varMoveX,
+                    y:i*interactif.height + offset.y + varMoveY
+                },
+                image: buisson_baies,
+                height: 128,
+                width: 128,
+                index: (+i*39)+j,
+                symbol: Symbol
+            }))
+            }
+            if (Symbol === 112+1){
+                gatherable.push(new interactif({position: {
+                    x:j*interactif.width + offset.x + varMoveX,
+                    y:i*interactif.height + offset.y + varMoveY
+                },
+                image: caillou,
+                height: 128,
+                width: 128,
+                index: (+i*39)+j,
+                symbol: Symbol
+            }))
+            }
+            if (Symbol === 113+1){
+                gatherable.push(new interactif({position: {
+                    x:j*interactif.width + offset.x + varMoveX,
+                    y:i*interactif.height + offset.y + varMoveY
+                },
+                image: branche,
+                height: 128,
+                width: 128,
+                index: (+i*39)+j,
+                symbol: Symbol
+            }))
+            }
+            if (Symbol === 114+1){
+                gatherable.push(new interactif({position: {
+                    x:j*interactif.width + offset.x + varMoveX,
+                    y:i*interactif.height + offset.y + varMoveY
+                },
+                image: buisson,
+                height: 128,
+                width: 128,
+                index: (+i*39)+j,
+                symbol: Symbol
+            }))
+            }
         })
     })
 }
 gatherableCalc()
+
 const gatherer = player;
 
 function gather({gatherer, gatherable}){
     return(
-        gatherer.position.x + gatherer.width >= gatherable.position.x   &&
-        gatherer.position.x <= gatherable.position.x +gatherable.width  &&
-        gatherer.position.y + gatherer.height >= gatherable.position.y  &&
-        gatherer.position.y <= gatherable.position.y + gatherable.height
+        gatherer.position.x + gatherer.width + 64 >= gatherable.position.x   &&
+        gatherer.position.x <= gatherable.position.x +gatherable.width +64 &&
+        gatherer.position.y + gatherer.height +64>= gatherable.position.y  &&
+        gatherer.position.y <= gatherable.position.y + gatherable.height +64
     )
 }
 
 let casesStatus = [0,0,0,0,0,0,0,0,0]
 let casesStatusNum = [0,0,0,0,0,0,0,0,0]
+let casesId = ["case0","case1","case2","case3","case4","case5","case6","case7","case8"]
 function gatherEvent(){
     window.addEventListener("mouseup",(e)=>{
         if(typeof e === "object"){
@@ -165,33 +212,51 @@ function gatherEvent(){
                 })){
                     switch(e.button){
                         case 2:
-                            console.log(casesStatus)
-                            if(casesStatus[0] == 0){
-                                let item = new Image();
-                                let itemList = ["data/Item/fibre.png"]
-                                item.src = itemList[interactif.symbol-1];
-                                let cases = document.getElementById("case0")
-                                cases.append(item);
-                                let number = document.createElement("p")
-                                number.setAttribute("name","count")
-                                casesStatusNum.splice([0],1,1)
-                                let iCount = casesStatusNum[0]
-                                number.innerHTML = iCount
-                                cases.append(number)
-                                casesStatus.splice([0], 1, interactif.symbol)
-                            }
-                            else{
-                                let number = document.getElementsByName("count")[0]
-                                casesStatusNum.splice([0],1,(casesStatusNum[0]+1))
-                                number.innerHTML = casesStatusNum[0]
-                            }
-                            console.log(casesStatus)
+                            
+                            let firstCorCase = casesStatus.findIndex((element) => element === interactif.symbol)
+                            let firstEmptyCase = casesStatus.findIndex((element) => element === 0)
+                            
+                            if(interactif.symbol !== 115){
+                                if(firstCorCase === -1){
+                                    cases = document.getElementById(casesId[firstEmptyCase])
+                                    let item = new Image();
+                                    let itemList = ["data/Item/baies.png","data/Item/caillou.png","data/Item/baton.png"]
+                                    item.src = itemList[interactif.symbol-112];
+                                    
+                                    
+                                    cases.append(item);
+                                    let number = document.createElement("p")
+                                    casesStatusNum.splice([firstEmptyCase],1,1)
+                                    let iCount = casesStatusNum[firstEmptyCase+1] +1
+                                    number.innerHTML = iCount
+                                    cases.append(number)
+                                    casesStatus.splice([firstEmptyCase], 1, interactif.symbol)
+                                }
+                                else{
+                                    let number = document.querySelector('#'+casesId[firstCorCase])
+                                    let numberP = number.lastElementChild
+                                    
+                                    casesStatusNum.splice([firstCorCase],1,(casesStatusNum[firstCorCase]+1))
+                                    numberP.innerHTML = casesStatusNum[firstCorCase]
+                                }
+                            
                             let index = interactif.index
                             let replace = 0
-                            ramassable.splice(index, 1, replace)
+                            
+                            if(interactif.symbol-112 === 0){
+                                ramassable.splice(index,1,115)
+                                
+                            }
+                            else{
+                                ramassable.splice(index, 1, replace)
+                            }
+                            
+                            
                             ramassableMapCalc()
                             gatherableCalc()
                             movablesCalc()
+                            }
+                            
                         break;
                     }
                 }
@@ -219,15 +284,14 @@ function rectangularCollision({rectangle1, rectangle2}){
 }
 
 function animate(){
+
     background.draw()
+    // boundaries.forEach(Bondary =>{
+    //     Bondary.draw()
+    // })
     gatherable.forEach(interactif => {
         interactif.draw()
-        if(gather({
-            gatherer: player,
-            gatherable: interactif
-        })){
-            console.log("ramasser")
-        }
+        
     })
 
 
@@ -242,8 +306,8 @@ function animate(){
                 rectangularCollision({
                     rectangle1: player,
                     rectangle2: {...boundary, position: {
-                        x: boundary.position.x + (speed-1.5),
-                        y: boundary.position.y - (speed-1.5)
+                        x: boundary.position.x - (speed-1.5),
+                        y: boundary.position.y + (speed-1.5)
                     }}
                 })
             ){
@@ -265,13 +329,17 @@ function animate(){
 
             }
         }
-        if (moving)
+        if (moving){
             movables.forEach(movables => {
                 movables.position.y += speed-1.5
                 movables.position.x -= speed-1.5
+                
             })
             varMoveY += speed-1.5
             varMoveX -= speed-1.5
+        }
+            
+            
     }
 
     else if (keys.z.pressed && keys.q.pressed){
@@ -304,13 +372,17 @@ function animate(){
 
             }
         }
-        if (moving)
+        if (moving){
             movables.forEach(movables => {
                 movables.position.y += speed-1.5
                 movables.position.x += speed-1.5
+
             })
             varMoveY += speed-1.5
             varMoveX += speed-1.5
+        }
+           
+           
     }
 
     else if (keys.z.pressed){
@@ -343,11 +415,15 @@ function animate(){
 
             }
         }
-        if (moving)
+        if (moving){
             movables.forEach(movables => {
                 movables.position.y += speed
+                
             })
             varMoveY += speed
+        }
+            
+           
     }
 
     else if (keys.s.pressed && keys.q.pressed){
@@ -357,8 +433,8 @@ function animate(){
                 rectangularCollision({
                     rectangle1: player,
                     rectangle2: {...boundary, position: {
-                        x: boundary.position.x - (speed-1.5),
-                        y: boundary.position.y + (speed-1.5)
+                        x: boundary.position.x + (speed-1.5),
+                        y: boundary.position.y - (speed-1.5)
                     }}
                 })
             ){
@@ -380,13 +456,17 @@ function animate(){
 
             }
         }
-        if (moving)
+        if (moving){
             movables.forEach(movables => {
                 movables.position.y -= speed-1.5
                 movables.position.x += speed-1.5
+                
             })
             varMoveY -= speed-1.5
             varMoveX += speed-1.5
+        }
+           
+           
     }
 
     else if (keys.s.pressed && keys.d.pressed){
@@ -419,13 +499,17 @@ function animate(){
 
             }
         }
-        if (moving)
+        if (moving){
             movables.forEach(movables => {
                 movables.position.y -= speed-1.5
                 movables.position.x -= speed-1.5
+            
             })
             varMoveY -= speed-1.5
             varMoveX -= speed-1.5
+        }
+           
+           
     }
 
     else if (keys.q.pressed){
@@ -457,11 +541,15 @@ function animate(){
             ){
             }
         }
-        if (moving)
+        if (moving){
             movables.forEach(movables => {
                 movables.position.x += speed
+                
             })
             varMoveX += speed
+        }
+           
+           
     }
 
     else if (keys.s.pressed){
@@ -494,11 +582,12 @@ function animate(){
 
             }
         }
-        if (moving)
+        if (moving){
             movables.forEach(movables => {
                 movables.position.y -= speed
             })
             varMoveY -= speed
+        }  
     }
 
     else if (keys.d.pressed){
@@ -531,11 +620,13 @@ function animate(){
 
             }
         }
-        if (moving)
+        if (moving){
             movables.forEach(movables => {
                 movables.position.x -= speed
+              
             })
             varMoveX -= speed
+        }
     }
 }
 animate()
