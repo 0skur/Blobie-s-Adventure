@@ -3,7 +3,6 @@ const c = canvas.getContext("2d");
 
 canvas.width = innerWidth;
 canvas.height = innerHeight;
-
 const collisionsMap = [];
 for (let i =0; i<collisions.length;i += 39){
     collisionsMap.push(collisions.slice(i,39 +i));
@@ -23,7 +22,7 @@ class Bondary{
 }
 const boundaries = [];
 const offset = {
-    x: -2000,
+    x: -2128,
     y: -1800
 }
 
@@ -88,8 +87,55 @@ const keys = {
         pressed: false
     }
 }
+const foregroundMap = [];
+for (let i =0; i<foreground.length;i += 39){
+    foregroundMap.push(foreground.slice(i,39 +i));
+}
 
+const arbre_haut_gauche = new Image();
+arbre_haut_gauche.src = "data/foreground/arbre-haut-gauche.png"
+const arbre_haut_droite = new Image();
+arbre_haut_droite.src = "data/foreground/arbre-haut-droite.png"
 
+class Foreground{
+    static width = 128;
+    static height = 128;
+    constructor({position, image, width, height}){
+        this.position = position;
+        this.image = image;
+        this.width = width;
+        this.height = height;
+    }
+    draw(){
+        c.drawImage(this.image,this.position.x,this.position.y);
+    }
+}
+const foregrounds = [];
+
+foregroundMap.forEach((row, i) => {
+    row.forEach((Symbol, j) => {
+        if (Symbol === 92){
+            foregrounds.push(new Foreground({position: {
+                x:j*Foreground.width + offset.x,
+                y:i*Foreground.height + offset.y
+            },
+            image : arbre_haut_gauche,
+            height: 128,
+            width: 128
+        }))
+        }
+        if (Symbol === 93){
+            foregrounds.push(new Foreground({position: {
+                x:j*Foreground.width + offset.x,
+                y:i*Foreground.height + offset.y
+            },
+            image : arbre_haut_droite,
+            height: 128,
+            width: 128
+        }))
+        }
+    })
+})
 //_____________________________________________________INTERACTIF_OBJECT_____________________________________________________
 
 let ramassableMap = [];
@@ -135,7 +181,7 @@ function gatherableCalc(){
     gatherable = []
     ramassableMap.forEach((row, i) => {
         row.forEach((Symbol, j) => {
-            if (Symbol === 111+1){
+            if (Symbol === 116){
                 gatherable.push(new interactif({position: {
                     x:j*interactif.width + offset.x + varMoveX,
                     y:i*interactif.height + offset.y + varMoveY
@@ -147,7 +193,7 @@ function gatherableCalc(){
                 symbol: Symbol
             }))
             }
-            if (Symbol === 112+1){
+            if (Symbol === 117){
                 gatherable.push(new interactif({position: {
                     x:j*interactif.width + offset.x + varMoveX,
                     y:i*interactif.height + offset.y + varMoveY
@@ -159,7 +205,7 @@ function gatherableCalc(){
                 symbol: Symbol
             }))
             }
-            if (Symbol === 113+1){
+            if (Symbol === 118){
                 gatherable.push(new interactif({position: {
                     x:j*interactif.width + offset.x + varMoveX,
                     y:i*interactif.height + offset.y + varMoveY
@@ -171,7 +217,7 @@ function gatherableCalc(){
                 symbol: Symbol
             }))
             }
-            if (Symbol === 114+1){
+            if (Symbol === 119){
                 gatherable.push(new interactif({position: {
                     x:j*interactif.width + offset.x + varMoveX,
                     y:i*interactif.height + offset.y + varMoveY
@@ -216,12 +262,12 @@ function gatherEvent(){
                             let firstCorCase = casesStatus.findIndex((element) => element === interactif.symbol)
                             let firstEmptyCase = casesStatus.findIndex((element) => element === 0)
                             
-                            if(interactif.symbol !== 115){
+                            if(interactif.symbol !== 119){
                                 if(firstCorCase === -1){
                                     cases = document.getElementById(casesId[firstEmptyCase])
                                     let item = new Image();
                                     let itemList = ["data/Item/baies.png","data/Item/caillou.png","data/Item/baton.png"]
-                                    item.src = itemList[interactif.symbol-112];
+                                    item.src = itemList[interactif.symbol-116];
                                     
                                     
                                     cases.append(item);
@@ -243,8 +289,8 @@ function gatherEvent(){
                             let index = interactif.index
                             let replace = 0
                             
-                            if(interactif.symbol-112 === 0){
-                                ramassable.splice(index,1,115)
+                            if(interactif.symbol-116 === 0){
+                                ramassable.splice(index,1,119)
                                 
                             }
                             else{
@@ -269,7 +315,7 @@ gatherEvent()
 //_____________________________________________________INTERACTIF_OBJECT_END____________________________________________________
 let movables = []
 function movablesCalc(){
-    movables = [background, ...boundaries, ...gatherable]
+    movables = [background, ...boundaries, ...gatherable, ...foregrounds]
 }
 movablesCalc()
 const speed = 5;
@@ -286,17 +332,19 @@ function rectangularCollision({rectangle1, rectangle2}){
 function animate(){
 
     background.draw()
-    // boundaries.forEach(Bondary =>{
-    //     Bondary.draw()
-    // })
+    boundaries.forEach(Bondary =>{
+        Bondary.draw()
+    })
     gatherable.forEach(interactif => {
         interactif.draw()
         
     })
-
-
     window.requestAnimationFrame(animate);
     player.draw()
+    foregrounds.forEach(Foreground =>{
+        Foreground.draw()
+    })
+
     let moving = true
 
     if (keys.z.pressed && keys.d.pressed){
