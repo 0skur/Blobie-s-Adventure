@@ -10,3 +10,4 @@ Prochaine màj :
     - endurance, énergie, faim et vie 
     - mort
     - refonte des hitbox
+    - définition du point d'apparition
