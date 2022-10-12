@@ -64,10 +64,45 @@ function selectCase(){
 }
 selectCase()
 
-const zoneBouton = document.createElement("section")
-zoneBouton.setAttribute("style","position: absolute; width: 75px;height :75px ;background-color: rgb(255,0,0);right: 10px; top: 10px;")
-gameZone.append(zoneBouton)
+//BOUTON CRAFT----------------------------------------------------------------------------------------------------------------------------
 
+const zoneBouton = document.createElement("section")
+zoneBouton.setAttribute("style","position: absolute; width: 75px;height :75px ;right: 10px; top: 10px;")
+gameZone.append(zoneBouton)
+const boutonCraft = new Image();
+boutonCraft.src = "data/craft_logo.png";
+zoneBouton.append(boutonCraft)
+
+const craftMenu = document.createElement("section")
+craftMenu.setAttribute("style","position: absolute; width: 500px;height: 500px;background-color: rgba(200,200,200,0.75);bottom:0px;right:0px;visibility: hidden;overflow")
+let visible = 0
+gameZone.append(craftMenu)
+
+function openCraftMenu(){
+    console.log("craft")
+    if(visible === 0){
+        craftMenu.setAttribute("style","position: absolute; width: 500px;height: 500px;background-color: rgba(200,200,200,0.75);bottom:0px;right:0px;visibility: visible;")
+        visible = 1
+    }
+    else{
+        craftMenu.setAttribute("style","position: absolute; width: 500px;height: 500px;background-color: rgba(200,200,200,0.75);bottom:0px;right:0px;visibility: hidden;")
+        visible = 0
+    }
+    
+}
+boutonCraft.addEventListener("click", ()=>{
+    openCraftMenu()
+})
+
+window.addEventListener("keyup", (e) =>{
+    switch(e.key){
+        case "c": case "C":
+        openCraftMenu()
+        break
+    }
+})
+
+//FAIM ET VIE-----------------------------------------------------------------------------------------------------------------------------
 let barreFaimWidth = 50
 let barreVieWidth = 100
 
@@ -88,15 +123,23 @@ barreVieRemplissage.setAttribute("style","  width:"+barreVieWidth+"%;height: 30p
 barreVie.append(barreVieRemplissage)
 
 function useFood(){
-    window.addEventListener("click", (e) =>{
+    
+        console.log("miam")
         if ((casesStatus[caseActive] === 116) && (casesStatusNum[caseActive] > 0)){
             barreFaimWidth = barreFaimWidth + 10
-            casesStatusNum[caseActive]--
+            if(barreFaimWidth > 100){
+                barreFaimWidth = barreFaimWidth - 10
+            }
+            else{
+                casesStatusNum[caseActive]--
             document.getElementById(casesTable[caseActive]).lastElementChild.innerHTML = casesStatusNum[caseActive]
             barreFaimRemplissage.setAttribute("style","  width:"+barreFaimWidth+"%;height: 30px;background-color: rgb(176,82,0);text-align: center;line-height: 30px;color: white;")
+            }
         }
-})}
-useFood()
+    }
+gameZone.addEventListener("click", (e) =>{
+    useFood()
+})
 
 function faim(){
     if (barreFaimWidth >= 0){
@@ -111,7 +154,7 @@ function faim(){
         vie()
     }
 }
-setInterval(faim,60000)
+setInterval(faim,30000)
 
 function vie(){
     if (barreVieWidth === -1){

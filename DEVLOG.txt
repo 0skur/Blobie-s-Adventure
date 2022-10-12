@@ -7,6 +7,6 @@ ________________________________________________________________________________
 Prochaine màj :
     - système de craft
     - animation de mouvement
-    - endurance, énergie, faim et vie
+    - endurance, énergie, faim et vie 
     - mort
     - refonte des hitbox

@@ -3,38 +3,6 @@ const c = canvas.getContext("2d");
 
 canvas.width = innerWidth;
 canvas.height = innerHeight;
-const collisionsMap = [];
-for (let i =0; i<collisions.length;i += 39){
-    collisionsMap.push(collisions.slice(i,39 +i));
-}
-class Bondary{
-    static width = 128;
-    static height = 128;
-    constructor({position}){
-        this.position = position;
-        this.width = 128;
-        this.height = 128;
-    }
-    draw(){
-        c.fillStyle = 'rgba(255,0,0,0.5)';
-        c.fillRect(this.position.x, this.position.y, this.width,this.height);
-    }
-}
-const boundaries = [];
-const offset = {
-    x: -2128,
-    y: -1800
-}
-
-collisionsMap.forEach((row, i) => {
-    row.forEach((Symbol, j) => {
-        if (Symbol === 37)
-        boundaries.push(new Bondary({position: {
-            x:j*Bondary.width + offset.x,
-            y:i*Bondary.height + offset.y
-        }}))
-    })
-})
 
 const image = new Image();
 image.src = "data/map_2.png";
@@ -57,7 +25,37 @@ class Sprite{
     }
 }
 
-const player = new Sprite({
+let spawnPointMap = []
+for (let i =0; i<spawnPoint.length;i += 39){
+    spawnPointMap.push(spawnPoint.slice(i,39 +i));
+}
+spawnPointCoo = []
+spawnPointMap.forEach((row, i) => {
+    row.forEach((Symbol, j) => {
+        if (Symbol === 1)
+        spawnPointCoo.push(new Sprite({position: {
+            x:j*128,
+            y:i*128
+        },
+        image: playerImage
+        }))
+    })
+})
+
+const boundaries = [];
+const offset = {
+    x: -spawnPointCoo[0].position.x + canvas.width/2,
+    y: -spawnPointCoo[0].position.y + canvas.height/2
+}
+
+
+
+
+
+
+
+
+let player = new Sprite({
     position:{
         x:canvas.width/2,
         y:canvas.height/2
@@ -72,6 +70,35 @@ const background = new Sprite({
     },
     image: image,
 })
+console.log(background)
+const collisionsMap = [];
+for (let i =0; i<collisions.length;i += 39){
+    collisionsMap.push(collisions.slice(i,39 +i));
+}
+class Bondary{
+    static width = 128;
+    static height = 128;
+    constructor({position}){
+        this.position = position;
+        this.width = 128;
+        this.height = 128;
+    }
+    draw(){
+        c.fillStyle = 'rgba(255,0,0,0.5)';
+        c.fillRect(this.position.x, this.position.y, this.width,this.height);
+    }
+}
+
+
+collisionsMap.forEach((row, i) => {
+    row.forEach((Symbol, j) => {
+        if (Symbol === 37)
+        boundaries.push(new Bondary({position: {
+            x:j*Bondary.width + offset.x,
+            y:i*Bondary.height + offset.y
+        }}))
+    })
+})
 
 const keys = {
     z: {
@@ -84,6 +111,9 @@ const keys = {
         pressed: false
     },
     d: {
+        pressed: false
+    },
+    shift: {
         pressed: false
     }
 }
@@ -116,7 +146,7 @@ foregroundMap.forEach((row, i) => {
     row.forEach((Symbol, j) => {
         if (Symbol === 92){
             foregrounds.push(new Foreground({position: {
-                x:j*Foreground.width + offset.x,
+                x:j*Foreground.width + offset.x, 
                 y:i*Foreground.height + offset.y
             },
             image : arbre_haut_gauche,
@@ -126,7 +156,7 @@ foregroundMap.forEach((row, i) => {
         }
         if (Symbol === 93){
             foregrounds.push(new Foreground({position: {
-                x:j*Foreground.width + offset.x,
+                x:j*Foreground.width + offset.x, 
                 y:i*Foreground.height + offset.y
             },
             image : arbre_haut_droite,
@@ -183,8 +213,8 @@ function gatherableCalc(){
         row.forEach((Symbol, j) => {
             if (Symbol === 116){
                 gatherable.push(new interactif({position: {
-                    x:j*interactif.width + offset.x + varMoveX,
-                    y:i*interactif.height + offset.y + varMoveY
+                    x:j*Foreground.width + offset.x + varMoveX, 
+                    y:i*Foreground.height + offset.y + varMoveY
                 },
                 image: buisson_baies,
                 height: 128,
@@ -195,8 +225,8 @@ function gatherableCalc(){
             }
             if (Symbol === 117){
                 gatherable.push(new interactif({position: {
-                    x:j*interactif.width + offset.x + varMoveX,
-                    y:i*interactif.height + offset.y + varMoveY
+                    x:j*Foreground.width + offset.x + varMoveX, 
+                    y:i*Foreground.height + offset.y + varMoveY
                 },
                 image: caillou,
                 height: 128,
@@ -207,8 +237,8 @@ function gatherableCalc(){
             }
             if (Symbol === 118){
                 gatherable.push(new interactif({position: {
-                    x:j*interactif.width + offset.x + varMoveX,
-                    y:i*interactif.height + offset.y + varMoveY
+                    x:j*Foreground.width + offset.x + varMoveX, 
+                    y:i*Foreground.height + offset.y + varMoveY
                 },
                 image: branche,
                 height: 128,
@@ -219,8 +249,8 @@ function gatherableCalc(){
             }
             if (Symbol === 119){
                 gatherable.push(new interactif({position: {
-                    x:j*interactif.width + offset.x + varMoveX,
-                    y:i*interactif.height + offset.y + varMoveY
+                    x:j*Foreground.width + offset.x + varMoveX, 
+                    y:i*Foreground.height + offset.y + varMoveY
                 },
                 image: buisson,
                 height: 128,
@@ -318,7 +348,6 @@ function movablesCalc(){
     movables = [background, ...boundaries, ...gatherable, ...foregrounds]
 }
 movablesCalc()
-const speed = 5;
 
 function rectangularCollision({rectangle1, rectangle2}){
     return(
@@ -346,7 +375,7 @@ function animate(){
     })
 
     let moving = true
-
+    let speed = 5
     if (keys.z.pressed && keys.d.pressed){
         for (let i=0;i<boundaries.length;i++){
             const boundary = boundaries[i];
@@ -693,6 +722,9 @@ window.addEventListener("keydown", (e) =>{
         case "d":
             keys.d.pressed = true;
         break
+        case "Shift":
+            keys.shift.pressed = true;
+        break
     }
 })
 window.addEventListener("keyup", (e) =>{
@@ -708,6 +740,9 @@ window.addEventListener("keyup", (e) =>{
         break
         case "d":
             keys.d.pressed = false;
+        break
+        case "Shift":
+            keys.shift.pressed = false;
         break
     }
 })
