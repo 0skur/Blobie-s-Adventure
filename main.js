@@ -48,13 +48,6 @@ const offset = {
     y: -spawnPointCoo[0].position.y + canvas.height/2
 }
 
-
-
-
-
-
-
-
 let player = new Sprite({
     position:{
         x:canvas.width/2,
@@ -70,7 +63,7 @@ const background = new Sprite({
     },
     image: image,
 })
-console.log(background)
+
 const collisionsMap = [];
 for (let i =0; i<collisions.length;i += 39){
     collisionsMap.push(collisions.slice(i,39 +i));
@@ -78,28 +71,38 @@ for (let i =0; i<collisions.length;i += 39){
 class Bondary{
     static width = 128;
     static height = 128;
-    constructor({position}){
+    constructor({position, image, width, height}){
         this.position = position;
-        this.width = 128;
-        this.height = 128;
+        this.image = image;
+        this.width = width;
+        this.height = height;
     }
     draw(){
-        c.fillStyle = 'rgba(255,0,0,0.5)';
-        c.fillRect(this.position.x, this.position.y, this.width,this.height);
+        c.drawImage(this.image,this.position.x,this.position.y);
     }
 }
 
+const topBondary = new Image();
+topBondary.src = "data/collision/top.png"
 
 collisionsMap.forEach((row, i) => {
     row.forEach((Symbol, j) => {
-        if (Symbol === 37)
-        boundaries.push(new Bondary({position: {
-            x:j*Bondary.width + offset.x,
-            y:i*Bondary.height + offset.y
-        }}))
+        if (Symbol === 91){
+            boundaries.push(new Bondary({
+                position: {
+                    x:j*Bondary.width + offset.x,
+                    y:i*Bondary.height + 64 + offset.y
+            },
+                image: topBondary,
+                width: 128,
+                height: 16
+            }))
+        }
+
+        
     })
 })
-
+console.log(boundaries)
 const keys = {
     z: {
         pressed: false
