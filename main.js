@@ -30,6 +30,7 @@ for (let i =0; i<spawnPoint.length;i += 39){
     spawnPointMap.push(spawnPoint.slice(i,39 +i));
 }
 spawnPointCoo = []
+
 spawnPointMap.forEach((row, i) => {
     row.forEach((Symbol, j) => {
         if (Symbol === 1)
@@ -68,6 +69,7 @@ const collisionsMap = [];
 for (let i =0; i<collisions.length;i += 39){
     collisionsMap.push(collisions.slice(i,39 +i));
 }
+console.log(collisions)
 class Bondary{
     static width = 128;
     static height = 128;
@@ -84,6 +86,8 @@ class Bondary{
 
 const topBondary = new Image();
 topBondary.src = "data/collision/top.png"
+const sideBondary = new Image();
+sideBondary.src = "data/collision/side.png"
 
 collisionsMap.forEach((row, i) => {
     row.forEach((Symbol, j) => {
@@ -91,15 +95,46 @@ collisionsMap.forEach((row, i) => {
             boundaries.push(new Bondary({
                 position: {
                     x:j*Bondary.width + offset.x,
-                    y:i*Bondary.height + 64 + offset.y
+                    y:i*Bondary.height + 80 + offset.y
             },
                 image: topBondary,
                 width: 128,
-                height: 16
+                height: 4
             }))
         }
-
-        
+        else if (Symbol === 90){
+            boundaries.push(new Bondary({
+                position: {
+                    x:j*Bondary.width + 40 + offset.x,
+                    y:i*Bondary.height + offset.y
+            },
+                image: sideBondary,
+                width: 4,
+                height: 128
+            }))
+        }
+        else if (Symbol === 89){
+            boundaries.push(new Bondary({
+                position: {
+                    x:j*Bondary.width + 80 + offset.x,
+                    y:i*Bondary.height + offset.y
+            },
+                image: sideBondary,
+                width: 4,
+                height: 128
+            }))
+        }
+        else if (Symbol === 102){
+            boundaries.push(new Bondary({
+                position: {
+                    x:j*Bondary.width + offset.x,
+                    y:i*Bondary.height + 40 + offset.y
+            },
+                image: topBondary,
+                width: 128,
+                height: 4
+            }))
+        }
     })
 })
 console.log(boundaries)
@@ -107,13 +142,25 @@ const keys = {
     z: {
         pressed: false
     },
+    Z: {
+        pressed: false
+    },
     q: {
+        pressed: false
+    },
+    Q: {
         pressed: false
     },
     s: {
         pressed: false
     },
+    S: {
+        pressed: false
+    },
     d: {
+        pressed: false
+    },
+    D: {
         pressed: false
     },
     shift: {
@@ -713,16 +760,16 @@ animate()
 let lastKey = '';
 window.addEventListener("keydown", (e) =>{
     switch(e.key){
-        case "z":
+        case "z": case "Z":
             keys.z.pressed = true;
         break
-        case "q":
+        case "q": case "Q":
             keys.q.pressed = true;
         break
-        case "s":
+        case "s": case "S":
             keys.s.pressed = true;
         break
-        case "d":
+        case "d": case "D":
             keys.d.pressed = true;
         break
         case "Shift":
@@ -732,16 +779,16 @@ window.addEventListener("keydown", (e) =>{
 })
 window.addEventListener("keyup", (e) =>{
     switch(e.key){
-        case "z":
+        case "z": case "Z":
             keys.z.pressed = false;
         break
-        case "q":
+        case "q": case "Q":
             keys.q.pressed = false;
         break
-        case "s":
+        case "s": case "S":
             keys.s.pressed = false;
         break
-        case "d":
+        case "d": case "D":
             keys.d.pressed = false;
         break
         case "Shift":
