@@ -2,7 +2,7 @@ const gameZone = document.getElementById("gameZone")
 const barreAccèsRapide = document.createElement("section");
 let width = 675;
 let height = 75;
-barreAccèsRapide.setAttribute("style", "position: absolute; bottom: 20px; height:"+height+"px; background-color: rgba(200,200,200,0.75); display: flex; border: 1px solid rgb(100,100,100); left:"+(innerWidth/2-width/2)+"px")
+barreAccèsRapide.setAttribute("style", "position: absolute; bottom: 20px; height:"+height+"px; background-color: rgba(200,200,200,0.75); display: flex; border: 1px solid rgb(100,100,100);")
 gameZone.append(barreAccèsRapide)
 
 for (i=0;i<9;i++){
@@ -67,7 +67,7 @@ selectCase()
 //BOUTON CRAFT----------------------------------------------------------------------------------------------------------------------------
 
 const zoneBouton = document.createElement("section")
-zoneBouton.setAttribute("style","position: absolute; width: 75px;height :75px ;right: 10px; top: 10px;")
+zoneBouton.setAttribute("style","position: absolute; width: 75px;height :75px ;right: 10px; top: 10px;border: 2px solid rgb(30,30,30);border-radius: 20px;")
 gameZone.append(zoneBouton)
 const boutonCraft = new Image();
 boutonCraft.src = "data/craft_logo.png";
@@ -111,8 +111,16 @@ barreFaim.setAttribute("style","position: absolute; width: 200px;height :30px ;b
 gameZone.append(barreFaim)
 
 const barreFaimRemplissage = document.createElement("section")
-barreFaimRemplissage.setAttribute("style","  width:"+barreFaimWidth+"%;height: 30px;background-color: rgb(176,82,0);text-align: center;line-height: 30px;color: white;")
+barreFaimRemplissage.setAttribute("style","width:"+barreFaimWidth+"%;height: 30px;background-color: rgb(176,82,0);text-align: center;line-height: 30px;color: white;overflow:visible")
 barreFaim.append(barreFaimRemplissage)
+
+const nbFaimZone = document.createElement("section")
+nbFaimZone.setAttribute("style","display: flex;justify-content: center; align-items: center;top: 0; height: 100%; width: 100%;position: absolute;")
+barreFaim.append(nbFaimZone)
+
+const nbFaim = document.createElement("p")
+nbFaim.textContent = barreFaimWidth + "%"
+nbFaimZone.append(nbFaim)
 
 const barreVie = document.createElement("section")
 barreVie.setAttribute("style","position: absolute; width: 200px;height :30px ;border: 2px solid black;left: 10px; top: 50px;")
@@ -122,8 +130,16 @@ const barreVieRemplissage = document.createElement("section")
 barreVieRemplissage.setAttribute("style","  width:"+barreVieWidth+"%;height: 30px;background-color: rgb(230,0,0);text-align: center;line-height: 30px;color: white;")
 barreVie.append(barreVieRemplissage)
 
+const nbVieZone = document.createElement("section")
+nbVieZone.setAttribute("style","display: flex;justify-content: center; align-items: center;top: 0; height: 100%; width: 100%;position: absolute;")
+barreVie.append(nbVieZone)
+
+const nbVie = document.createElement("p")
+nbVie.textContent = barreVieWidth + "%"
+nbVieZone.append(nbVie)
+
+
 function useFood(){
-    
         console.log("miam")
         if ((casesStatus[caseActive] === 116) && (casesStatusNum[caseActive] > 0)){
             barreFaimWidth = barreFaimWidth + 10
@@ -132,8 +148,9 @@ function useFood(){
             }
             else{
                 casesStatusNum[caseActive]--
-            document.getElementById(casesTable[caseActive]).lastElementChild.innerHTML = casesStatusNum[caseActive]
-            barreFaimRemplissage.setAttribute("style","  width:"+barreFaimWidth+"%;height: 30px;background-color: rgb(176,82,0);text-align: center;line-height: 30px;color: white;")
+                document.getElementById(casesTable[caseActive]).lastElementChild.innerHTML = casesStatusNum[caseActive]
+                barreFaimRemplissage.setAttribute("style","  width:"+barreFaimWidth+"%;height: 30px;background-color: rgb(176,82,0);text-align: center;line-height: 30px;color: white;")
+                nbFaim.textContent = barreFaimWidth + "%"
             }
         }
     }
@@ -142,22 +159,28 @@ gameZone.addEventListener("click", (e) =>{
 })
 
 function faim(){
-    if (barreFaimWidth >= 0){
+    if (barreFaimWidth > 0){
         barreFaimRemplissage.setAttribute("style","  width:"+barreFaimWidth+"%;height: 30px;background-color: rgb(176,82,0);text-align: center;line-height: 30px;color: white;")
         barreFaimWidth--
+        nbFaim.textContent = barreFaimWidth + "%"
     }
-    if ((barreVieWidth >=0) && (barreFaimWidth === -1)){
+    if ((barreVieWidth > 0) && (barreFaimWidth === 0)){
         barreVieRemplissage.setAttribute("style","  width:"+barreVieWidth+"%;height: 30px;background-color: rgb(230,0,0);text-align: center;line-height: 30px;color: white;")
         barreVieWidth--
+        nbVie.textContent = barreVieWidth + "%"
     }
     else{
         vie()
     }
 }
-setInterval(faim,30000)
+setInterval(faim,15000)
 
 function vie(){
-    if (barreVieWidth === -1){
+    if (barreVieWidth === 0){
         //alert("Vous êtes mort")
     }
 }
+//ACCES AU MENU-----------------------------------------------------------------------------------------------------------------------------
+const boutonMenu = document.createElement("section");
+boutonMenu.setAttribute("style","position: absolute;width: 75px;height: 75px;left: 10px;bottom: 10px;border: 2px solid rgb(30,30,30);border-radius: 20px;")
+gameZone.append(boutonMenu)

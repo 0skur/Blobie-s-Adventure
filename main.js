@@ -69,7 +69,7 @@ const collisionsMap = [];
 for (let i =0; i<collisions.length;i += 39){
     collisionsMap.push(collisions.slice(i,39 +i));
 }
-console.log(collisions)
+
 class Bondary{
     static width = 128;
     static height = 128;
@@ -83,11 +83,13 @@ class Bondary{
         c.drawImage(this.image,this.position.x,this.position.y);
     }
 }
-
+console.log(collisions)
 const topBondary = new Image();
 topBondary.src = "data/collision/top.png"
 const sideBondary = new Image();
 sideBondary.src = "data/collision/side.png"
+const treeBondary = new Image()
+treeBondary.src = "data/collision/tree.png"
 
 collisionsMap.forEach((row, i) => {
     row.forEach((Symbol, j) => {
@@ -135,6 +137,17 @@ collisionsMap.forEach((row, i) => {
                 height: 4
             }))
         }
+        else if (Symbol === 124){
+            boundaries.push(new Bondary({
+                position: {
+                    x:j*Bondary.width - 20 + offset.x,
+                    y:i*Bondary.height + 60 + offset.y
+            },
+                image: treeBondary,
+                width: 46,
+                height: 4
+            }))
+        }
     })
 })
 console.log(boundaries)
@@ -176,6 +189,14 @@ const arbre_haut_gauche = new Image();
 arbre_haut_gauche.src = "data/foreground/arbre-haut-gauche.png"
 const arbre_haut_droite = new Image();
 arbre_haut_droite.src = "data/foreground/arbre-haut-droite.png"
+const arbre_centre_gauche = new Image();
+arbre_centre_gauche.src = "data/foreground/arbre-centre-gauche.png"
+const arbre_centre_droite = new Image();
+arbre_centre_droite.src = "data/foreground/arbre-centre-droite.png"
+const arbre_bas_gauche = new Image();
+arbre_bas_gauche.src = "data/foreground/arbre-bas-gauche.png"
+const arbre_bas_droite = new Image()
+arbre_bas_droite.src = "data/foreground/arbre-bas-droite.png"
 
 class Foreground{
     static width = 128;
@@ -204,12 +225,52 @@ foregroundMap.forEach((row, i) => {
             width: 128
         }))
         }
-        if (Symbol === 93){
+        else if (Symbol === 93){
             foregrounds.push(new Foreground({position: {
                 x:j*Foreground.width + offset.x, 
                 y:i*Foreground.height + offset.y
             },
             image : arbre_haut_droite,
+            height: 128,
+            width: 128
+        }))
+        }
+        else if (Symbol === 103){
+            foregrounds.push(new Foreground({position: {
+                x:j*Foreground.width + offset.x, 
+                y:i*Foreground.height + offset.y
+            },
+            image : arbre_centre_gauche,
+            height: 128,
+            width: 128
+        }))
+        }
+        else if (Symbol === 104){
+            foregrounds.push(new Foreground({position: {
+                x:j*Foreground.width + offset.x, 
+                y:i*Foreground.height + offset.y
+            },
+            image : arbre_centre_droite,
+            height: 128,
+            width: 128
+        }))
+        }
+        else if (Symbol === 114){
+            foregrounds.push(new Foreground({position: {
+                x:j*Foreground.width + offset.x, 
+                y:i*Foreground.height + offset.y
+            },
+            image : arbre_bas_gauche,
+            height: 128,
+            width: 128
+        }))
+        }
+        else if (Symbol === 115){
+            foregrounds.push(new Foreground({position: {
+                x:j*Foreground.width + offset.x, 
+                y:i*Foreground.height + offset.y
+            },
+            image : arbre_bas_droite,
             height: 128,
             width: 128
         }))
