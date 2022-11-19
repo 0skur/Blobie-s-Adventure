@@ -4,24 +4,37 @@ const c = canvas.getContext("2d");
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 
-const image = new Image();
-image.src = "data/map_2.png";
+const map = new Image();
+map.src = "data/map.png";
 
-const playerImage = new Image();
-playerImage.src = "data/personnage.png"
+const playerImageBack = new Image();
+playerImageBack.src = "data/Character/personnageBack.png"
+
+const playerImageFront = new Image();
+playerImageFront.src = "data/Character/personnageFront.png"
+
+const playerImageLeft = new Image();
+playerImageLeft.src = "data/Character/personnageLeft.png"
+
+const playerImageRight = new Image();
+playerImageRight.src = "data/Character/personnageRight.png"
 
 class Sprite{
-    constructor({position, image}){
+    constructor({position, velocity, image, frames = {max: 1}, sprites}){
         this.position = position
         this.image = image
         this.image.onload = () =>{
             this.width = this.image.width
             this.height = this.image.height
         }
+        this.sprites = sprites
     }
     draw(){
-            c.drawImage(this.image,this.position.x,this.position.y);
-            c.drawImage(this.image,this.position.x,this.position.y);
+        c.drawImage(
+            this.image,
+            this.position.x,
+            this.position.y
+        )      
     }
 }
 
@@ -38,7 +51,7 @@ spawnPointMap.forEach((row, i) => {
             x:j*128,
             y:i*128
         },
-        image: playerImage
+        image: playerImageFront
         }))
     })
 })
@@ -54,7 +67,13 @@ let player = new Sprite({
         x:canvas.width/2,
         y:canvas.height/2
     },
-    image: playerImage
+    image: playerImageFront,
+    sprites: {
+        up: playerImageBack,
+        down: playerImageFront,
+        left: playerImageLeft,
+        right: playerImageRight,
+    }
 })
 
 const background = new Sprite({
@@ -62,7 +81,7 @@ const background = new Sprite({
         x: offset.x,
         y: offset.y
     },
-    image: image,
+    image: map,
 })
 
 const collisionsMap = [];
@@ -187,16 +206,27 @@ for (let i =0; i<foreground.length;i += 39){
 
 const arbre_haut_gauche = new Image();
 arbre_haut_gauche.src = "data/foreground/arbre-haut-gauche.png"
+
 const arbre_haut_droite = new Image();
 arbre_haut_droite.src = "data/foreground/arbre-haut-droite.png"
+
 const arbre_centre_gauche = new Image();
 arbre_centre_gauche.src = "data/foreground/arbre-centre-gauche.png"
+
 const arbre_centre_droite = new Image();
 arbre_centre_droite.src = "data/foreground/arbre-centre-droite.png"
+
 const arbre_bas_gauche = new Image();
 arbre_bas_gauche.src = "data/foreground/arbre-bas-gauche.png"
-const arbre_bas_droite = new Image()
+
+const arbre_bas_droite = new Image();
 arbre_bas_droite.src = "data/foreground/arbre-bas-droite.png"
+
+const arbre_bas_haut_gauche = new Image();
+arbre_bas_haut_gauche.src = "data/foreground/arbre-bas-haut-gauche.png"
+
+const arbre_bas_haut_droite = new Image();
+arbre_bas_haut_droite.src = "data/foreground/arbre-bas-haut-droite.png"
 
 class Foreground{
     static width = 128;
@@ -275,6 +305,26 @@ foregroundMap.forEach((row, i) => {
             width: 128
         }))
         }
+        else if (Symbol === 127){
+            foregrounds.push(new Foreground({position: {
+                x:j*Foreground.width + offset.x, 
+                y:i*Foreground.height + offset.y
+            },
+            image : arbre_bas_haut_gauche,
+            height: 128,
+            width: 128
+        }))
+        }
+        else if (Symbol === 128){
+            foregrounds.push(new Foreground({position: {
+                x:j*Foreground.width + offset.x, 
+                y:i*Foreground.height + offset.y
+            },
+            image : arbre_bas_haut_droite,
+            height: 128,
+            width: 128
+        }))
+        }
     })
 })
 //_____________________________________________________INTERACTIF_OBJECT_____________________________________________________
@@ -289,14 +339,15 @@ function ramassableMapCalc(){
 ramassableMapCalc()
 const branche = new Image();
 branche.src = "data/interactifObject/branche.png"
+
 const caillou = new Image();
 caillou.src = "data/interactifObject/caillou.png"
+
 const buisson = new Image();
 buisson.src = "data/interactifObject/buisson.png"
+
 const buisson_baies = new Image();
 buisson_baies.src = "data/interactifObject/buisson_baies.png"
-
-
 
 class interactif{
     static width = 128;
@@ -574,6 +625,7 @@ function animate(){
     }
 
     else if (keys.z.pressed){
+        player.image = player.sprites.up
         for (let i=0;i<boundaries.length;i++){
             const boundary = boundaries[i];
             if(
@@ -700,7 +752,47 @@ function animate(){
            
     }
 
+    else if (keys.s.pressed){
+        player.image = player.sprites.down
+        for (let i=0;i<boundaries.length;i++){
+            const boundary = boundaries[i];
+            if(
+                rectangularCollision({
+                    rectangle1: player,
+                    rectangle2: {...boundary, position: {
+                        x: boundary.position.x,
+                        y: boundary.position.y - speed
+                    }}
+                })
+            ){
+                moving = false;
+                break
+            }
+        }
+        for(let i=0;i<gatherable.length;i++){
+            const movable = gatherable[i]
+            if(
+                gather({
+                    gatherer: player,
+                    gatherable: {...movable, position: {
+                        x: movable.position.x,
+                        y: movable.position.y
+                    }}
+                })
+            ){
+
+            }
+        }
+        if (moving){
+            movables.forEach(movables => {
+                movables.position.y -= speed
+            })
+            varMoveY -= speed
+        }  
+    }
+
     else if (keys.q.pressed){
+        player.image = player.sprites.left
         for (let i=0;i<boundaries.length;i++){
             const boundary = boundaries[i];
             if(
@@ -740,45 +832,8 @@ function animate(){
            
     }
 
-    else if (keys.s.pressed){
-        for (let i=0;i<boundaries.length;i++){
-            const boundary = boundaries[i];
-            if(
-                rectangularCollision({
-                    rectangle1: player,
-                    rectangle2: {...boundary, position: {
-                        x: boundary.position.x,
-                        y: boundary.position.y - speed
-                    }}
-                })
-            ){
-                moving = false;
-                break
-            }
-        }
-        for(let i=0;i<gatherable.length;i++){
-            const movable = gatherable[i]
-            if(
-                gather({
-                    gatherer: player,
-                    gatherable: {...movable, position: {
-                        x: movable.position.x,
-                        y: movable.position.y
-                    }}
-                })
-            ){
-
-            }
-        }
-        if (moving){
-            movables.forEach(movables => {
-                movables.position.y -= speed
-            })
-            varMoveY -= speed
-        }  
-    }
-
     else if (keys.d.pressed){
+        player.image = player.sprites.right
         for (let i=0;i<boundaries.length;i++){
             const boundary = boundaries[i];
             if(
