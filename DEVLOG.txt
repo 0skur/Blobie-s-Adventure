@@ -6,8 +6,8 @@ Version 0.3 "prototype game" =>
 __________________________________________________________________________________________________
 Prochaine màj (0.5 "prototype game"):
 EN  - système de craft
-NC  - animation de mouvement
-EN  - endurance, énergie, faim et vie 
+EN  - animation de mouvement
+EN  - endurance, énergie, faim, soif et vie 
 EN  - mort
 EN  - refonte des hitbox
 T   - définition du point d'apparition
