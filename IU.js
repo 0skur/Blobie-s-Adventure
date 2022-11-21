@@ -65,13 +65,17 @@ function selectCase(){
 selectCase()
 
 //BOUTON CRAFT----------------------------------------------------------------------------------------------------------------------------
+const zoneBoutons = document.createElement("section")
+zoneBoutons.setAttribute("style","position: absolute;right: 10px; top: 10px;display: grid;row-gap: 10px")
+gameZone.append(zoneBoutons)
 
-const zoneBouton = document.createElement("section")
-zoneBouton.setAttribute("style","position: absolute; width: 75px;height :75px ;right: 10px; top: 10px;border: 2px solid rgb(30,30,30);border-radius: 20px;")
-gameZone.append(zoneBouton)
+const zoneBoutonCraft = document.createElement("section")
+zoneBoutonCraft.setAttribute("style"," width: 75px;height :75px ;border: 2px solid rgb(30,30,30);border-radius: 20px;")
+zoneBoutons.append(zoneBoutonCraft)
+
 const boutonCraft = new Image();
 boutonCraft.src = "data/craft_logo.png";
-zoneBouton.append(boutonCraft)
+zoneBoutonCraft.append(boutonCraft)
 
 const craftMenu = document.createElement("section")
 craftMenu.setAttribute("style","position: absolute; width: 500px;height: 500px;background-color: rgba(200,200,200,0.75);bottom:0px;right:0px;visibility: hidden;overflow")
@@ -182,5 +186,11 @@ function vie(){
 }
 //ACCES AU MENU-----------------------------------------------------------------------------------------------------------------------------
 const boutonMenu = document.createElement("section");
-boutonMenu.setAttribute("style","position: absolute;width: 75px;height: 75px;left: 10px;bottom: 10px;border: 2px solid rgb(30,30,30);border-radius: 20px;")
-gameZone.append(boutonMenu)
+boutonMenu.setAttribute("style","width: 75px;height: 75px;border: 2px solid rgb(30,30,30);border-radius: 20px;")
+boutonMenu.setAttribute("class","centrer")
+zoneBoutons.append(boutonMenu)
+
+const boutonMenuImage = new Image();
+boutonMenuImage.src = "data/Pictures/menu.png"
+boutonMenuImage.setAttribute("style","max-height: 60px; max-width: 60px;")
+boutonMenu.append(boutonMenuImage)

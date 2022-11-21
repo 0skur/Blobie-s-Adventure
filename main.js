@@ -521,7 +521,9 @@ function rectangularCollision({rectangle1, rectangle2}){
 }
 
 function animate(){
-
+    ramassableMapCalc()
+    gatherableCalc()
+    movablesCalc()
     background.draw()
     boundaries.forEach(Bondary =>{
         Bondary.draw()

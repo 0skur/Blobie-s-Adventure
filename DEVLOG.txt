@@ -4,7 +4,7 @@ Version 0.3 "prototype game" =>
     - Nouveau items
 
 __________________________________________________________________________________________________
-Prochaine màj (0.5 "prototype game"):
+Prochaine màj (0.5 "prototype game") =>
 EN  - système de craft
 EN  - animation de mouvement
 EN  - endurance, énergie, faim, soif et vie 
