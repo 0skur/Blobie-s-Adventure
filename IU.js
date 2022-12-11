@@ -65,43 +65,105 @@ function selectCase(){
 selectCase()
 
 //BOUTON CRAFT----------------------------------------------------------------------------------------------------------------------------
+const gameMenu = document.createElement("section")
+gameMenu.setAttribute("style","width: 50%;max-width:500px;height: 50%;max-height:500px;background-color: rgba(200,200,255,0.75);position: absolute;bottom: 10px; left: 10px;display: grid;grid-template-rows: 20% 80%;border: 10px solid rgba(70, 104, 149, 0.75);display: none;")
+
+gameZone.append(gameMenu)
+
 const zoneBoutons = document.createElement("section")
-zoneBoutons.setAttribute("style","position: absolute;right: 10px; top: 10px;display: grid;row-gap: 10px")
-gameZone.append(zoneBoutons)
+zoneBoutons.setAttribute("style","display: grid;grid-template-columns: 100px 100px;grid-area:1/1/1/1")
+gameMenu.append(zoneBoutons)
 
 const zoneBoutonCraft = document.createElement("section")
-zoneBoutonCraft.setAttribute("style"," width: 75px;height :75px ;border: 2px solid rgb(30,30,30);border-radius: 20px;")
+zoneBoutonCraft.setAttribute("style","grid-area: 1/1/1/1")
+zoneBoutonCraft.setAttribute("class","centrer")
+zoneBoutonCraft.setAttribute("onclick","craftMenu()")
 zoneBoutons.append(zoneBoutonCraft)
 
 const boutonCraft = new Image();
 boutonCraft.src = "data/craft_logo.png";
+boutonCraft.setAttribute("class","bouton")
 zoneBoutonCraft.append(boutonCraft)
 
-const craftMenu = document.createElement("section")
-craftMenu.setAttribute("style","position: absolute; width: 500px;height: 500px;background-color: rgba(200,200,200,0.75);bottom:0px;right:0px;visibility: hidden;overflow")
-let visible = 0
-gameZone.append(craftMenu)
-
-function openCraftMenu(){
-    console.log("craft")
-    if(visible === 0){
-        craftMenu.setAttribute("style","position: absolute; width: 500px;height: 500px;background-color: rgba(200,200,200,0.75);bottom:0px;right:0px;visibility: visible;")
-        visible = 1
+//MENU CRAFT------------------------------------------------------------------------------------------------------------------------------
+const menuCraft = document.createElement("section")
+menuCraft.setAttribute("style","display: none;width: 100%; height: 100%;grid-area:2/1/2/1;background-color: rgba(150,150,200,0.75)")
+gameMenu.append(menuCraft)
+let craftVisible = 0
+function craftMenu(){
+    if(craftVisible ===0){
+        menuCraft.setAttribute("style","display: initial;width: 100%; height: 100%;grid-area:2/1/2/1;background-color: rgba(150,150,200,0.75)")
+        craftVisible = 1
     }
     else{
-        craftMenu.setAttribute("style","position: absolute; width: 500px;height: 500px;background-color: rgba(200,200,200,0.75);bottom:0px;right:0px;visibility: hidden;")
-        visible = 0
+        menuCraft.setAttribute("style","display: none;width: 100%; height: 100%;grid-area:2/1/2/1;background-color: rgba(150,150,200,0.75)")
+        craftVisible = 0
+    }
+}
+
+//LISTE ITEM CRAFT------------------------------------------------------------------------------------------------------------------------
+const hache = document.createElement("section")
+hache.setAttribute("style","padding: 10px;border: 1px solid rgb(230,230,230);background-color: rgb(200,200,200);color: rgb(30,30,30)")
+hache.innerHTML = "Hache en pierre"
+hache.setAttribute("onclick","craft([1,1,0],[117,118,0])")
+menuCraft.append(hache)
+
+//FONCTION CRAFT--------------------------------------------------------------------------------------------------------------------------
+function craft(coutItem = [0,0,0], typeItem = ["","",""]){
+    let item_crafted = false
+    if(item_crafted == false){
+        for(i=0;i < typeItem.length -1;i++){
+            if(casesStatus.find(element => element = typeItem[i])){
+                if(casesStatus[casesStatus.indexOf(typeItem[i])] - coutItem[i] >= 0){
+                    item_crafted = true
+                }
+                else{
+                    item_crafted = false
+                }
+            }
+            else{
+                item_crafted = false
+            }
+        }
+        if(item_crafted == true){
+            inventaire(120,"craft",coutItem,typeItem)
+        }
+        
     }
     
 }
-boutonCraft.addEventListener("click", ()=>{
-    openCraftMenu()
-})
+//ACCES AU MENU---------------------------------------------------------------------------------------------------------------------------
+const zoneBoutonMenu = document.createElement("section");
+zoneBoutonMenu.setAttribute("style","grid-area: 1/2/1/2")
+zoneBoutonMenu.setAttribute("class","centrer")
+zoneBoutonMenu.setAttribute("onclick","location.href='menu.html'")
+zoneBoutons.append(zoneBoutonMenu)
+
+const boutonMenu = document.createElement("section");
+boutonMenu.setAttribute("class","bouton centrer")
+zoneBoutonMenu.append(boutonMenu)
+
+const boutonMenuImage = new Image();
+boutonMenuImage.src = "data/Pictures/menu.png"
+boutonMenu.append(boutonMenuImage)
+
+let menuVisible = 0
+function openMenu(){
+    if(menuVisible === 0){
+        gameMenu.setAttribute("style","width: 50%;max-width:500px;height: 50%;max-height:500px;background-color: rgba(200,200,255,0.75);position: absolute;bottom: 10px; left: 10px;display: grid;grid-template-rows: 20% 80%;border: 10px solid rgba(70, 104, 149, 0.75);")
+        menuVisible = 1
+    }
+    else{
+        gameMenu.setAttribute("style","width: 50%;max-width:500px;height: 50%;max-height:500px;background-color: rgba(200,200,255,0.75);position: absolute;bottom: 10px; left: 10px;display: grid;grid-template-rows: 20% 80%;border: 10px solid rgba(70, 104, 149, 0.75);display: none;")
+        menuVisible = 0
+    }
+    
+}
 
 window.addEventListener("keyup", (e) =>{
     switch(e.key){
-        case "c": case "C":
-        openCraftMenu()
+        case "Escape":
+            openMenu()
         break
     }
 })
@@ -144,7 +206,6 @@ nbVieZone.append(nbVie)
 
 
 function useFood(){
-        console.log("miam")
         if ((casesStatus[caseActive] === 116) && (casesStatusNum[caseActive] > 0)){
             barreFaimWidth = barreFaimWidth + 10
             if(barreFaimWidth > 100){
@@ -152,9 +213,9 @@ function useFood(){
             }
             else{
                 casesStatusNum[caseActive]--
-                document.getElementById(casesTable[caseActive]).lastElementChild.innerHTML = casesStatusNum[caseActive]
                 barreFaimRemplissage.setAttribute("style","  width:"+barreFaimWidth+"%;height: 30px;background-color: rgb(176,82,0);text-align: center;line-height: 30px;color: white;")
                 nbFaim.textContent = barreFaimWidth + "%"
+                actualisationInventaire()
             }
         }
     }
@@ -184,13 +245,3 @@ function vie(){
         //alert("Vous êtes mort")
     }
 }
-//ACCES AU MENU-----------------------------------------------------------------------------------------------------------------------------
-const boutonMenu = document.createElement("section");
-boutonMenu.setAttribute("style","width: 75px;height: 75px;border: 2px solid rgb(30,30,30);border-radius: 20px;")
-boutonMenu.setAttribute("class","centrer")
-zoneBoutons.append(boutonMenu)
-
-const boutonMenuImage = new Image();
-boutonMenuImage.src = "data/Pictures/menu.png"
-boutonMenuImage.setAttribute("style","max-height: 60px; max-width: 60px;")
-boutonMenu.append(boutonMenuImage)

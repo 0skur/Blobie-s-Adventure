@@ -23,18 +23,41 @@ class Sprite{
     constructor({position, velocity, image, frames = {max: 1}, sprites}){
         this.position = position
         this.image = image
+        this.frames = {...frames, val: 0, elapsed: 0}
         this.image.onload = () =>{
-            this.width = this.image.width
+            this.width = this.image.width / this.frames.max
             this.height = this.image.height
         }
+        this.moving = false
         this.sprites = sprites
     }
     draw(){
         c.drawImage(
             this.image,
+            this.frames.val * this.width,
+            0,
+            this.image.width / this.frames.max,
+            this.image.height,
             this.position.x,
-            this.position.y
-        )      
+            this.position.y,
+            this.image.width / this.frames.max,
+            this.image.height
+        )   
+
+        if (this.moving){
+            if (this.frames.max > 1){
+                this.frames.elapsed++
+            }
+    
+            if (this.frames.elapsed % 20 === 0){
+                if (this.frames.val < this.frames.max -1){
+                    this.frames.val++
+                }
+                else{
+                    this.frames.val = 0
+                }
+            }
+        }
     }
 }
 
@@ -68,6 +91,9 @@ let player = new Sprite({
         y:canvas.height/2
     },
     image: playerImageFront,
+    frames: {
+        max: 4
+    },
     sprites: {
         up: playerImageBack,
         down: playerImageFront,
@@ -102,13 +128,16 @@ class Bondary{
         c.drawImage(this.image,this.position.x,this.position.y);
     }
 }
-console.log(collisions)
+
 const topBondary = new Image();
 topBondary.src = "data/collision/top.png"
 const sideBondary = new Image();
 sideBondary.src = "data/collision/side.png"
 const treeBondary = new Image()
 treeBondary.src = "data/collision/tree.png"
+const corner = new Image();
+corner.src = "data/collision/corner.png"
+
 
 collisionsMap.forEach((row, i) => {
     row.forEach((Symbol, j) => {
@@ -167,9 +196,120 @@ collisionsMap.forEach((row, i) => {
                 height: 4
             }))
         }
+
+        else if (Symbol === 100){
+            boundaries.push(new Bondary({
+                position: {
+                    x:j*Bondary.width + 96 + offset.x,
+                    y:i*Bondary.height + 96 + offset.y
+            },
+                image: corner,
+                width: 1,
+                height: 1
+            }))
+        }
+        else if (Symbol === 101){
+            boundaries.push(new Bondary({
+                position: {
+                    x:j*Bondary.width + 25 + offset.x,
+                    y:i*Bondary.height + 95 + offset.y
+            },
+                image: corner,
+                width: 1,
+                height: 1
+            }))
+        }
+        else if (Symbol === 109){
+            boundaries.push(new Bondary({
+                position: {
+                    x:j*Bondary.width + 64 + offset.x,
+                    y:i*Bondary.height + 56 + offset.y
+            },
+                image: corner,
+                width: 1,
+                height: 1
+            }))
+        }
+        else if (Symbol === 110){
+            boundaries.push(new Bondary({
+                position: {
+                    x:j*Bondary.width + 64 + offset.x,
+                    y:i*Bondary.height + 56 + offset.y
+            },
+                image: corner,
+                width: 1,
+                height: 1
+            }))
+        }
+        else if (Symbol === 129){
+            boundaries.push(new Bondary({
+                position: {
+                    x:j*Bondary.width + 64 + offset.x,
+                    y:i*Bondary.height + 56 + offset.y
+            },
+                image: corner,
+                width: 1,
+                height: 4
+            }))
+        }
+        else if (Symbol === 111){
+            boundaries.push(new Bondary({
+                position: {
+                    x:j*Bondary.width + 95 + offset.x,
+                    y:i*Bondary.height + 25 + offset.y
+            },
+                image: corner,
+                width: 1,
+                height: 1
+            }))
+        }
+        else if (Symbol === 112){
+            boundaries.push(new Bondary({
+                position: {
+                    x:j*Bondary.width + 30 + offset.x,
+                    y:i*Bondary.height + 25 + offset.y
+            },
+                image: corner,
+                width: 1,
+                height: 1
+            }))
+        }
+        else if (Symbol === 120){
+            boundaries.push(new Bondary({
+                position: {
+                    x:j*Bondary.width + 64 + offset.x,
+                    y:i*Bondary.height + 56 + offset.y
+            },
+                image: corner,
+                width: 1,
+                height: 1
+            }))
+        }
+        else if (Symbol === 121){
+            boundaries.push(new Bondary({
+                position: {
+                    x:j*Bondary.width + 64 + offset.x,
+                    y:i*Bondary.height + 56 + offset.y
+            },
+                image: corner,
+                width: 1,
+                height: 1
+            }))
+        }
+        else if (Symbol === 130){
+            boundaries.push(new Bondary({
+                position: {
+                    x:j*Bondary.width + 64 + offset.x,
+                    y:i*Bondary.height + 28 + offset.y
+            },
+                image: corner,
+                width: 1,
+                height: 8
+            }))
+        }
     })
 })
-console.log(boundaries)
+
 const keys = {
     z: {
         pressed: false
@@ -327,7 +467,7 @@ foregroundMap.forEach((row, i) => {
         }
     })
 })
-//_____________________________________________________INTERACTIF_OBJECT_____________________________________________________
+//INTERACTIF_OBJECT_______________________________________________________________________________________________________________________
 
 let ramassableMap = [];
 function ramassableMapCalc(){
@@ -440,6 +580,119 @@ function gather({gatherer, gatherable}){
 let casesStatus = [0,0,0,0,0,0,0,0,0]
 let casesStatusNum = [0,0,0,0,0,0,0,0,0]
 let casesId = ["case0","case1","case2","case3","case4","case5","case6","case7","case8"]
+
+function inventaire(item,task,coutItem,typeItem){
+    if(task == "craft"){
+        if(item !== undefined){
+            newItem = item
+        }
+        let firstCorCase = casesStatus.findIndex((element) => element === newItem)
+        let firstEmptyCase = casesStatus.findIndex((element) => element === 0)
+        console.log(newItem)
+        console.log(casesStatus)
+        console.log(casesStatusNum)
+        console.log(firstCorCase)
+        console.log(firstEmptyCase)
+        console.log(coutItem)
+        console.log(typeItem)
+                        
+        if(firstCorCase === -1){
+            cases = document.getElementById(casesId[firstEmptyCase])
+            let item = new Image();
+            let itemList = ["data/Item/hache_en_pierre.png"]
+            item.src = itemList[newItem-120];
+            console.log(item.src)        
+            cases.append(item);
+            let number = document.createElement("p")
+            casesStatusNum.splice([firstEmptyCase],1,1)
+            let iCount = casesStatusNum[firstEmptyCase+1] +1
+            number.innerHTML = iCount
+            cases.append(number)
+            casesStatus.splice([firstEmptyCase], 1, newItem)
+        }
+        else{
+            let number = document.querySelector('#'+casesId[firstCorCase])
+            let numberP = number.lastElementChild
+                            
+            casesStatusNum.splice([firstCorCase],1,(casesStatusNum[firstCorCase]+1))
+            numberP.innerHTML = casesStatusNum[firstCorCase]
+        }
+
+        for(i=0;i <= typeItem.length-1;i++){
+            element = typeItem[i]
+            elementCost = coutItem[typeItem.indexOf(element)]
+            console.log("i="+i)
+            console.log(element)
+            console.log(elementCost)
+            if(element!==0){
+                let indexInvSupr = casesStatus.indexOf(casesStatus.find(element => element === typeItem[i]))
+                console.log(indexInvSupr)
+                console.log(casesStatus[indexInvSupr])
+                casesStatusNum.splice(indexInvSupr,1,parseInt(casesStatusNum[indexInvSupr]-1))
+            }
+        console.log(casesStatus)
+        console.log(casesStatusNum) 
+        }
+        actualisationInventaire()
+    }
+
+    if(task == "gather"){
+        gatherable.forEach(interactif =>{
+            if(gather({
+                gatherer: player,
+                gatherable: interactif
+            })){
+                let newItem = interactif.symbol
+                if(item !== undefined){
+                    newItem = item
+                }
+                let firstCorCase = casesStatus.findIndex((element) => element === newItem)
+                let firstEmptyCase = casesStatus.findIndex((element) => element === 0)
+                                
+                if(newItem !== 119){
+                    if(firstCorCase === -1){
+                        cases = document.getElementById(casesId[firstEmptyCase])
+                        let item = new Image();
+                        let itemList = ["data/Item/baies.png","data/Item/caillou.png","data/Item/baton.png"]
+                        item.src = itemList[newItem-116];
+                                        
+                        cases.append(item);
+                        let number = document.createElement("p")
+                        casesStatusNum.splice([firstEmptyCase],1,1)
+                        let iCount = casesStatusNum[firstEmptyCase+1] +1
+                        number.innerHTML = iCount
+                        cases.append(number)
+                        casesStatus.splice([firstEmptyCase], 1, newItem)
+                    }
+                    else{
+                        let number = document.querySelector('#'+casesId[firstCorCase])
+                        let numberP = number.lastElementChild
+                        if(numberP === null){
+                            numberP = 0
+                        }
+                                        
+                        casesStatusNum.splice([firstCorCase],1,(casesStatusNum[firstCorCase]+1))
+                        numberP.innerHTML = casesStatusNum[firstCorCase]
+                    }
+                    let index = interactif.index
+                    let replace = 0          
+                    if(newItem-116 === 0){
+                        ramassable.splice(index,1,119)             
+                    }
+                else{
+                    ramassable.splice(index, 1, replace)
+                }
+                }
+                
+                                
+                ramassableMapCalc()
+                gatherableCalc()
+                movablesCalc()
+            }  
+        })
+    }
+}
+                    
 function gatherEvent(){
     window.addEventListener("mouseup",(e)=>{
         if(typeof e === "object"){
@@ -450,51 +703,7 @@ function gatherEvent(){
                 })){
                     switch(e.button){
                         case 2:
-                            
-                            let firstCorCase = casesStatus.findIndex((element) => element === interactif.symbol)
-                            let firstEmptyCase = casesStatus.findIndex((element) => element === 0)
-                            
-                            if(interactif.symbol !== 119){
-                                if(firstCorCase === -1){
-                                    cases = document.getElementById(casesId[firstEmptyCase])
-                                    let item = new Image();
-                                    let itemList = ["data/Item/baies.png","data/Item/caillou.png","data/Item/baton.png"]
-                                    item.src = itemList[interactif.symbol-116];
-                                    
-                                    
-                                    cases.append(item);
-                                    let number = document.createElement("p")
-                                    casesStatusNum.splice([firstEmptyCase],1,1)
-                                    let iCount = casesStatusNum[firstEmptyCase+1] +1
-                                    number.innerHTML = iCount
-                                    cases.append(number)
-                                    casesStatus.splice([firstEmptyCase], 1, interactif.symbol)
-                                }
-                                else{
-                                    let number = document.querySelector('#'+casesId[firstCorCase])
-                                    let numberP = number.lastElementChild
-                                    
-                                    casesStatusNum.splice([firstCorCase],1,(casesStatusNum[firstCorCase]+1))
-                                    numberP.innerHTML = casesStatusNum[firstCorCase]
-                                }
-                            
-                            let index = interactif.index
-                            let replace = 0
-                            
-                            if(interactif.symbol-116 === 0){
-                                ramassable.splice(index,1,119)
-                                
-                            }
-                            else{
-                                ramassable.splice(index, 1, replace)
-                            }
-                            
-                            
-                            ramassableMapCalc()
-                            gatherableCalc()
-                            movablesCalc()
-                            }
-                            
+                            inventaire(undefined,"gather",undefined,undefined)
                         break;
                     }
                 }
@@ -504,7 +713,7 @@ function gatherEvent(){
 }
 gatherEvent()
 
-//_____________________________________________________INTERACTIF_OBJECT_END____________________________________________________
+//INTERACTIF_OBJECT_END___________________________________________________________________________________________________________________
 let movables = []
 function movablesCalc(){
     movables = [background, ...boundaries, ...gatherable, ...foregrounds]
@@ -524,6 +733,7 @@ function animate(){
     ramassableMapCalc()
     gatherableCalc()
     movablesCalc()
+    
     background.draw()
     boundaries.forEach(Bondary =>{
         Bondary.draw()
@@ -539,8 +749,10 @@ function animate(){
     })
 
     let moving = true
+    player.moving = false
     let speed = 5
     if (keys.z.pressed && keys.d.pressed){
+        player.moving = true
         for (let i=0;i<boundaries.length;i++){
             const boundary = boundaries[i];
             if(
@@ -584,6 +796,7 @@ function animate(){
     }
 
     else if (keys.z.pressed && keys.q.pressed){
+        player.moving = true
         for (let i=0;i<boundaries.length;i++){
             const boundary = boundaries[i];
             if(
@@ -627,6 +840,7 @@ function animate(){
     }
 
     else if (keys.z.pressed){
+        player.moving = true
         player.image = player.sprites.up
         for (let i=0;i<boundaries.length;i++){
             const boundary = boundaries[i];
@@ -669,6 +883,7 @@ function animate(){
     }
 
     else if (keys.s.pressed && keys.q.pressed){
+        player.moving = true
         for (let i=0;i<boundaries.length;i++){
             const boundary = boundaries[i];
             if(
@@ -712,6 +927,7 @@ function animate(){
     }
 
     else if (keys.s.pressed && keys.d.pressed){
+        player.moving = true
         for (let i=0;i<boundaries.length;i++){
             const boundary = boundaries[i];
             if(
@@ -755,6 +971,7 @@ function animate(){
     }
 
     else if (keys.s.pressed){
+        player.moving = true
         player.image = player.sprites.down
         for (let i=0;i<boundaries.length;i++){
             const boundary = boundaries[i];
@@ -794,6 +1011,7 @@ function animate(){
     }
 
     else if (keys.q.pressed){
+        player.moving = true
         player.image = player.sprites.left
         for (let i=0;i<boundaries.length;i++){
             const boundary = boundaries[i];
@@ -835,6 +1053,7 @@ function animate(){
     }
 
     else if (keys.d.pressed){
+        player.moving = true
         player.image = player.sprites.right
         for (let i=0;i<boundaries.length;i++){
             const boundary = boundaries[i];

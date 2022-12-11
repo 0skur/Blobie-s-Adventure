@@ -20,6 +20,11 @@
     grid-template-rows: repeat(2,1fr);
     row-gap: 30px;
 }
+.bouton{
+    width: 75px;
+    height :75px;
+    border: 2px solid rgb(30,30,30);
+}
 .centrer{
     display: flex;
     justify-content: center;
